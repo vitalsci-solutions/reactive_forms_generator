@@ -411,6 +411,9 @@ class FormGenerator {
             return '${e.fieldName}:${e.fieldValueName}';
           }).whereType<String>();
 
+          // Escape $ in class name
+          final sanitizedClassName = classNameFull.replaceAll('\$', '\\\$');
+
           b
             ..name = 'model'
             ..returns = Reference(element.fullTypeName)
@@ -418,7 +421,7 @@ class FormGenerator {
             ..type = MethodType.getter
             ..body = Code('''
               if (!currentForm.valid) {
-                debugPrint('[\${path ?? '$classNameFull'}]\\n┗━ Avoid calling `model` on invalid form. Possible exceptions for non-nullable fields which should be guarded by `required` validator.');
+                debugPrint('[\${path ?? '$sanitizedClassName'}]\\n┗━ Avoid calling `model` on invalid form. Possible exceptions for non-nullable fields which should be guarded by `required` validator.');
               }
               return ${element.fullTypeName}(${parameterValues.join(', ')});
             ''');
